@@ -1,5 +1,5 @@
 const express = require('express');
-const authMiddleware = require('../middleware/authMiddleware');
+const { protect, admin } = require('../middleware/authMiddleware');
 const {
     getAllServices,
     getServiceById,
@@ -17,8 +17,8 @@ router.get('/:id', getServiceById);
 router.get('/category/:category', getServicesByCategory);
 
 // Protected routes (authentication required)
-router.post('/', authMiddleware, createService);
-router.put('/:id', authMiddleware, updateService);
-router.delete('/:id', authMiddleware, deleteService);
+router.post('/', protect, admin, createService);
+router.put('/:id', protect, admin, updateService);
+router.delete('/:id', protect, admin, deleteService);
 
 module.exports = router;

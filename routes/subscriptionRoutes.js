@@ -1,5 +1,5 @@
 const express = require('express');
-const authMiddleware = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 const {
     getUserSubscription,
     getSubscriptionById,
@@ -13,7 +13,7 @@ const {
 const router = express.Router();
 
 // All subscription routes require authentication
-router.use(authMiddleware);
+router.use(protect);
 
 // Subscription management routes
 router.get('/', getUserSubscription);

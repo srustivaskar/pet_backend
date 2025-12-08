@@ -1,5 +1,5 @@
 const express = require('express');
-const authMiddleware = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 const {
     getUserBookings,
     getBookingById,
@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 
 // All booking routes require authentication
-router.use(authMiddleware);
+router.use(protect);
 
 // Booking management routes
 router.get('/', getUserBookings);
