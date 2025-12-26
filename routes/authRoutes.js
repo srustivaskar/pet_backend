@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Public routes
 router.post('/signup', signup);
+router.post('/register', signup); // Add register endpoint for frontend compatibility
 router.post('/login', login);
 
 // Protected route (requires authentication)

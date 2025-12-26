@@ -42,8 +42,7 @@ exports.signup = async (req, res) => {
         const existingUser = await User.findOne({
             $or: [
                 { email: email.toLowerCase() },
-                { username },
-                { phoneNumber }
+                { username }
             ]
         });
 
@@ -58,12 +57,6 @@ exports.signup = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "Username is already taken"
-                });
-            }
-            if (existingUser.phoneNumber === phoneNumber) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Phone number is already registered"
                 });
             }
         }
@@ -81,7 +74,8 @@ exports.signup = async (req, res) => {
             phoneNumber,
             dogAge,
             email: email.toLowerCase(),
-            password: hashedPassword
+            password: hashedPassword,
+            role: 'user' // Force role to 'user' for regular signup
         });
 
         await user.save();
@@ -103,7 +97,7 @@ exports.signup = async (req, res) => {
             }
         });
 
-        } catch (error) {
+    } catch (error) {
             console.error('Signup error:', error);
             if (error.code === 11000) {
                 // Duplicate key error

@@ -196,32 +196,37 @@ exports.createBooking = async (req, res) => {
         await booking.populate('petId', 'name breed');
 
         // Get customer details for email notification
-        const customer = await User.findById(req.user.id).select('name email phoneNumber');
-        const customerForEmail = customer ? {
-            ...customer.toObject(),
-            phone: customer.phoneNumber
-        } : undefined;
-
-        console.log('📧 Attempting to send booking emails...');
-        console.log('📧 Customer email:', customerForEmail?.email);
-
+        const customer = await User.findById(req.user.id).select('name email phone');
+        
+        console.log('📧 Attempting to send email notifications...');
+        console.log('📧 Customer email:', customer.email);
+        
+        // Send confirmation email to customer
         try {
-            await sendBookingEmails({
+            await sendBookingConfirmationEmail({
                 booking,
-                customer: customerForEmail,
+                customer,
                 pet,
                 service
             });
-            console.log('✅ Booking emails queued');
+            console.log('✅ Customer booking confirmation sent to:', customer.email);
         } catch (emailError) {
-            console.error('❌ Failed to send booking emails:', emailError);
+            console.error('❌ Failed to send customer confirmation:', emailError);
+            // Continue with booking creation even if email fails
         }
-
-        // Notify any connected admin dashboards (SSE)
+        
+        // Send notification email to admin
         try {
-            broadcastNewBooking(booking.toJSON ? booking.toJSON() : booking);
-        } catch (broadcastError) {
-            console.error('❌ Failed to broadcast new booking:', broadcastError);
+            await sendAdminBookingNotification({
+                booking,
+                customer,
+                pet,
+                service
+            });
+            console.log('✅ Admin booking notification sent successfully');
+        } catch (emailError) {
+            console.error('❌ Failed to send admin notification:', emailError);
+            // Continue with booking creation even if email fails
         }
 
         res.status(201).json({

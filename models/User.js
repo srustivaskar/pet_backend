@@ -10,28 +10,23 @@ const userSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: [true, 'Name is required'],
         trim: true
     },
     age: {
         type: Number,
-        required: [true, 'Age is required'],
         min: [1, 'Age must be at least 1']
     },
     owner: {
         type: String,
-        required: [true, 'Owner name is required'],
         trim: true
     },
     phoneNumber: {
         type: String,
-        required: [true, 'Phone number is required'],
         trim: true,
         match: [/^[0-9]{10}$/, 'Please enter a valid 10-digit phone number']
     },
     dogAge: {
         type: Number,
-        required: [true, 'Dog age is required'],
         min: [0, 'Dog age cannot be negative']
     },
     email: {

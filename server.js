@@ -1,7 +1,8 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
-require("dotenv").config();
+const path = require('path');
+require("dotenv").config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 
@@ -10,8 +11,12 @@ const allowedOrigins = [
     // For local development
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://localhost:2000",
+    "http://localhost:5000",
     "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001"
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:2000",
+    "http://127.0.0.1:5000"
 ];
 
 // Middleware
@@ -37,8 +42,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Load admin module
+const adminModule = require('../admin');
+
 // Connect to MongoDB
 connectDB();
+
+if (typeof adminModule.connectAdminDB === 'function') {
+  adminModule.connectAdminDB();
+}
+
+// Load admin models
+require('../admin/models/AdminDashboard');
+require('../admin/models/AdminLog');
+require('../admin/models/SystemSettings');
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -48,6 +65,12 @@ app.use("/api/pets", require("./routes/petRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/subscriptions", require("./routes/subscriptionRoutes"));
 app.use("/api/books", require("./routes/bookRoutes"));
+
+// Admin routes
+app.use("/api/admin", adminModule.adminRoutes);
+app.use("/api/admin/services", adminModule.serviceManagementRoutes);
+app.use("/api/admin/notifications", adminModule.notificationRoutes);
+app.use("/api/admin/pets", adminModule.petManagementRoutes);
 
 // Health check route
 app.get("/api/health", (req, res) => {
@@ -72,6 +95,7 @@ app.get("/", (req, res) => {
       pets: "/api/pets",
       bookings: "/api/bookings",
       subscriptions: "/api/subscriptions",
+      admin: "/api/admin",
       health: "/api/health"
     }
   });
