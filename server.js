@@ -42,20 +42,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Load admin module
-const adminModule = require('../admin');
-
 // Connect to MongoDB
 connectDB();
-
-if (typeof adminModule.connectAdminDB === 'function') {
-  adminModule.connectAdminDB();
-}
-
-// Load admin models
-require('../admin/models/AdminDashboard');
-require('../admin/models/AdminLog');
-require('../admin/models/SystemSettings');
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -65,12 +53,6 @@ app.use("/api/pets", require("./routes/petRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/subscriptions", require("./routes/subscriptionRoutes"));
 app.use("/api/books", require("./routes/bookRoutes"));
-
-// Admin routes
-app.use("/api/admin", adminModule.adminRoutes);
-app.use("/api/admin/services", adminModule.serviceManagementRoutes);
-app.use("/api/admin/notifications", adminModule.notificationRoutes);
-app.use("/api/admin/pets", adminModule.petManagementRoutes);
 
 // Health check route
 app.get("/api/health", (req, res) => {
@@ -95,7 +77,6 @@ app.get("/", (req, res) => {
       pets: "/api/pets",
       bookings: "/api/bookings",
       subscriptions: "/api/subscriptions",
-      admin: "/api/admin",
       health: "/api/health"
     }
   });
